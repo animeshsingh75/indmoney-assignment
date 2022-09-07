@@ -3,7 +3,6 @@ package com.example.indmoneyassignment.ui
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.ViewModelProvider
@@ -16,8 +15,8 @@ import com.example.indmoneyassignment.network.Resource
 import com.example.indmoneyassignment.repo.ContactListRepo
 import com.example.indmoneyassignment.ui.viewmodel.ContactListViewModel
 
+const val CONTACT_DATA = "contact_data"
 
-const val CONTACT_DATA="contact_data"
 class MainActivity : AppCompatActivity(), ContactListAdapter.OnItemClickListener {
     private lateinit var binding: ActivityMainBinding
     private val repo by lazy {
@@ -34,7 +33,9 @@ class MainActivity : AppCompatActivity(), ContactListAdapter.OnItemClickListener
             when (it) {
                 is Resource.Error -> {
                     it.message?.let { message ->
-                        Toast.makeText(this, message, Toast.LENGTH_LONG)
+                        binding.loadingPb.visibility = View.GONE
+                        binding.errorTv.visibility = View.VISIBLE
+                        binding.errorTv.text = message
                     }
                 }
                 is Resource.Loading -> {
@@ -51,10 +52,14 @@ class MainActivity : AppCompatActivity(), ContactListAdapter.OnItemClickListener
         }
     }
 
-    override fun onItemClicked(contactItem: ContactListItem,view:View) {
-        val intent=Intent(this, ContactDetailsActivity::class.java)
-        intent.putExtra(CONTACT_DATA,contactItem)
-        val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, view,this.resources.getString(R.string.profileImage))
-        startActivity(intent,options.toBundle())
+    override fun onItemClicked(contactItem: ContactListItem, view: View) {
+        val intent = Intent(this, ContactDetailsActivity::class.java)
+        intent.putExtra(CONTACT_DATA, contactItem)
+        val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+            this,
+            view,
+            this.resources.getString(R.string.profileImage)
+        )
+        startActivity(intent, options.toBundle())
     }
 }
